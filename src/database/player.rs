@@ -2,7 +2,8 @@ use chrono::{NaiveDate, NaiveDateTime};
 use const_format::concatcp;
 use rocket::futures::StreamExt as _;
 use serde::Serialize;
-use sqlx::{pool::PoolConnection, Executor as _, MySql, MySqlPool, Row as _};
+use sqlx::{pool::PoolConnection, Executor as _, MySql, MySqlPool, Row as _, FromRow};
+use serde_json::{json, Value};
 
 use super::error::Error;
 
@@ -358,4 +359,39 @@ pub async fn get_activity(ckey: &str, pool: &MySqlPool) -> Result<Vec<(String, i
     connection.close().await?;
 
     Ok(activity)
+}
+
+#[derive(Debug, Serialize, FromRow)]
+pub struct AchievementWithMetadata {
+    pub achievement_key: String,
+    pub value: i32,
+    pub achievement_version: u32,
+    pub achievement_type: String,
+    pub achievement_name: String,
+    pub achievement_description: String,
+}
+
+pub async fn get_achievements(
+    ckey: &str,
+    pool: &MySqlPool,
+) -> Result<Value, Error> {
+    let mut connection = pool.acquire().await?;
+
+    if !player_exists(ckey, &mut connection).await {
+        connection.close().await?;
+        return Err(Error::PlayerNotFound);
+    }
+
+    let query = sqlx::query_as::<_, AchievementWithMetadata>(
+       "SELECT u.achievement_key, u.value, m.achievement_version, m.achievement_type, m.achievement_name, m.achievement_description 
+        FROM achievements u 
+        JOIN achievement_metadata m ON u.achievement_key = m.achievement_key 
+        WHERE LOWER(u.ckey) = ?"
+    ).bind(ckey.to_lowercase());
+
+    let achievements: Vec<AchievementWithMetadata> = query.fetch_all(&mut *connection).await?;
+
+    connection.close().await?;
+
+    Ok(json!(achievements))
 }

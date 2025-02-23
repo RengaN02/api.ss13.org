@@ -17,6 +17,7 @@ pub fn mount(rocket: Rocket<Build>) -> Rocket<Build> {
         routes![
             patreon::index,
             patreon::patrons,
+            player::achievements,
             player::index,
             player::ban,
             player::characters,
@@ -33,6 +34,7 @@ pub fn mount(rocket: Rocket<Build>) -> Rocket<Build> {
             autocomplete::ckey,
             autocomplete::ic_name,
             events::deaths,
+            events::chart_data,
             events::citations
         ],
     )
