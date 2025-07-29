@@ -1,5 +1,6 @@
 use rocket::{routes, Build, Rocket};
 
+mod auth;
 mod autocomplete;
 mod byond;
 mod common;
@@ -39,6 +40,8 @@ pub fn mount(rocket: Rocket<Build>) -> Rocket<Build> {
             events::citations,
             events::crimes,
             events::deaths,
+            auth::discord_login,
+            auth::discord_callback,
         ],
     )
 }

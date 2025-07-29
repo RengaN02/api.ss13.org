@@ -13,6 +13,7 @@ pub struct Config {
     pub exposed_secret: String,
     pub exposed_routes: HashSet<String>,
     pub discord: Discord,
+    pub discord_oauth: DiscordOAuth,
     pub cli_colors: bool,
     pub log_level: LogLevel,
     pub database: Database,
@@ -24,6 +25,13 @@ pub struct Discord {
     pub token: String,
     pub guild: i64,
     pub patreon_role: i64,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct DiscordOAuth {
+    pub client_id: i64,
+    pub client_secret: String,
+    pub redirect_url: String,
 }
 
 #[derive(Debug, Deserialize)]

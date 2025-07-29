@@ -13,6 +13,11 @@ token = ""
 guild = 0
 patreon_role = 0
 
+[discord_oauth]
+client_id = 0
+client_secret = ""
+redirect_url = "http://localhost:3000/api/callback"
+
 [database]
 user = "root"
 password = ""
